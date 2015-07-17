@@ -1,0 +1,53 @@
+<modification>
+
+	<id>OC-Extensions.com - Mobile Store Theme</id>
+
+	<version>1.8</version>
+
+	<vqmver>1.0.8</vqmver>
+
+	<author>oc-extensions.com</author>
+
+
+
+	<file name="catalog/controller/common/footer.php">
+
+		<operation error="skip">
+
+			<search position="before"><![CDATA[if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/common/footer.tpl')) {]]></search>
+
+			<add><![CDATA[
+				$this->data['mobile_browser_used'] = false;
+				$this->data['mobile_version'] = $this->url->link('mobile_store/home', 'view_type=mobile', 'SSL');
+				
+				if (isset($this->session->data['mobile_browser']) && ($this->session->data['mobile_browser'] == 1)) {
+					$this->data['mobile_browser_used'] = true;	
+				}
+
+			]]></add>
+
+		</operation>
+
+	</file>
+
+	
+
+	<file name="catalog/view/theme/*/template/common/footer.tpl">
+
+		<operation error="skip">
+
+			<search position="before"><![CDATA[<div id="powered"><?php echo $powered; ?></div>]]></search>
+
+			<add><![CDATA[
+				<?php if ($mobile_browser_used) { ?>
+					<div class="switch-version" style="float: right;"><a href="<?php echo $mobile_version; ?>">Mobile Version</a></div>
+				<?php } ?>				
+		    ]]></add>
+
+		</operation>
+
+	</file>
+
+
+
+</modification>
