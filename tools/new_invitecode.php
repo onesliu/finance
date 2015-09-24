@@ -23,7 +23,7 @@ if ($count == null || $count <= 0) {
 function getRandomString($len, $chars=null)
 {
 	if (is_null($chars)){
-		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		$chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ23456789";
 	}  
 	mt_srand(10000000*(double)microtime());
 	for ($i = 0, $str = '', $lc = strlen($chars)-1; $i < $len; $i++){
@@ -50,10 +50,6 @@ if (isset($usertype)) {
 }
 else {
 	createCode($count, 0); // usertype 0: customer 客户
-	createCode($count, 1); // usertype 1: customer & user 配送商
-	createCode($count, 2); // usertype 2: seller 销售
-	createCode($count, 3); // usertype 3: user 分拣中心 总部
-	createCode($count, 4); // usertype 4: user 供应商
 }
 
 echo "Done.\n";

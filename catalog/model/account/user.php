@@ -1,7 +1,17 @@
 <?php
 class ModelAccountUser extends Model {
 	public function addUser($data) {
-		$this->db->query("INSERT INTO `" . DB_PREFIX . "user` SET username = '" . $this->db->escape($data['username']) . "', salt = '" . $this->db->escape($salt = substr(md5(uniqid(rand(), true)), 0, 9)) . "', password = '" . $this->db->escape(sha1($salt . sha1($salt . sha1($data['password'])))) . "', firstname = '" . $this->db->escape($data['firstname']) . "', lastname = '" . $this->db->escape($data['lastname']) . "', email = '" . $this->db->escape($data['email']) . "', user_group_id = '" . (int)$data['user_group_id'] . "', district_id = '" . (int)$data['district_id'] . "', status = '" . (int)$data['status'] . "', date_added = NOW()");
+		$this->db->query(
+		"INSERT INTO `" . DB_PREFIX . "user` SET username = '" . $this->db->escape($data['username']) .
+		"', salt = '" . $this->db->escape($salt = substr(md5(uniqid(rand(), true)), 0, 9)) .
+		"', password = '" . $this->db->escape(sha1($salt . sha1($salt . sha1($data['password'])))) .
+		"', firstname = '" . $this->db->escape($data['firstname']) .
+		"', lastname = '" . $this->db->escape($data['lastname']) .
+		"', email = '" . $this->db->escape($data['email']) .
+		"', user_group_id = '" . (int)$data['user_group_id'] .
+		"', district_id = '" . (int)$data['district_id'] .
+		"', status = '" . (int)$data['status'] .
+		"', date_added = NOW()");
 	}
 	
 	public function add_user($data) {
@@ -9,25 +19,19 @@ class ModelAccountUser extends Model {
 		$sql = sprintf($sql, $this->db->escape($data["telephone"]));
 		$ret = $this->db->query($sql);
 		if ($ret == false || $ret->row['cnt'] > 0) {
-			return "重复的手机号码";
+			return "重复的用户帐号";
 		}
 		
 		$usergroup = 0;
-		if ($data["usertype"] < 1 || $data["usertype"] > 4)
+		if ($data["usertype"] < 1 || $data["usertype"] > 2)
 			return "邀请码用户类型不正确";
 		
 		switch ($data["usertype"]) {
 			case 1:
-				$uname = "配送人员";
+				$uname = "业务员";
 				break;
 			case 2:
-				$uname = "销售人员";
-				break;
-			case 3:
-				$uname = "中心人员";
-				break;
-			case 4:
-				$uname = "供应商";
+				$uname = "代理商";
 				break;
 		}
 		$sql = "select user_group_id,name from oc_user_group where name='$uname'";
@@ -39,8 +43,10 @@ class ModelAccountUser extends Model {
 		$this->db->query("INSERT INTO `" . DB_PREFIX . "user` SET username = '" . $this->db->escape($data['telephone']) .
 		"', salt = '" . $this->db->escape($salt = substr(md5(uniqid(rand(), true)), 0, 9)) . 
 		"', password = '" . $this->db->escape(sha1($salt . sha1($salt . sha1($data['password'])))) . 
+		"', email = '" . $this->db->escape($data['email']) . 
 		"', firstname = '" . $this->db->escape($data['username']) . 
 		"', usertype = '" . (int)$data['usertype'] . 
+		"', user_pid = '" . (int)$data['userid'] . 
 		"', user_group_id = '" . (int)$usergroup . 
 		"', status = 1, date_added = NOW()");
 		

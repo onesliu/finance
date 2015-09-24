@@ -1,6 +1,6 @@
 require.config({
 	baseUrl : "catalog/view/javascript/",
-	urlArgs : "bust=2",
+	urlArgs : "ver=16",
 	paths : {
 		"swiper" : 'swiper/swiper.min',
 		"mustache" : 'mustache/mustache.min',
@@ -8,10 +8,12 @@ require.config({
 		"swipeImg" : 'my/swipeImg',
 		"category" : 'my/category',
 		"products" : 'my/products',
-		"widgets" : 'my/widgets',
-		"cart" : 'my/cart',
 		"delayImg" : 'my/delayImg',
-		"user" : 'my/user'
+		"user" : 'my/user',
+		"invitecode" : 'my/invitecode',
+		"requires" : "my/requires",
+		"userlevel" : "my/userlevel",
+		"apply" : "my/apply"
 	},
 	shim : {
 		"swiper" : {
@@ -20,36 +22,44 @@ require.config({
 	}
 });
 
+$.isMobile = window.navigator.userAgent.toLowerCase().indexOf('mobile') != -1;
+$.sClick = $.isMobile ? 'tap' : 'click';
+
 $.baseUrl = $('base').attr('href');
-
-var category = null;
-
-if (typeof homepage !== "undefined") {
-	require(['category'], function (c) {
-		c.init();
-		category = c;
-	});
-	
-	$(document).on("pageshow", "#homepage", function () {
-		if (category) {
-			var c = category.getCategory();
-			c.showMenu1();
-		}
-	});
-	
-	$(document).on("pageinit", "#cartpage", function () {
-		cart = require('cart');
-		cart.showCartList();
-	});
-	
-	$(document).on("pageshow", "#cartpage", function () {
-		cart = require('cart');
-		cart.showCartList();
-	});
+$.alertPopup = $("#alertPopup");
+$.alertPopup.enhanceWithin().popup({history:false,defaults:true,dismissible:false});
+$.alertPopup.mypopup = function(text, dofunc) {
+	$(this).find("p").text(text);
+	$(this).find("a").off($.sClick);
+	if (dofunc) {
+		$(this).find("a").on($.sClick, function() {
+			dofunc();
+		});
+	}
+	$(this).popup("open", {transition: "pop"});
 }
 
 if ((typeof loginpage !== "undefined") || (typeof registerpage !== "undefined")) {
 	require(['user'], function(u) {
 		u.init();
+		u.load();
+	});
+}
+
+if (typeof homepage !== "undefined") {
+	require(['category'], function (c) {
+		c.init();
+	});
+}
+
+if (typeof userlevelpage !== "undefined") {
+	require(['userlevel'], function (ulevel) {
+		ulevel.init();
+	});
+}
+
+if (typeof applylistpage !== "undefined") {
+	require(['apply'], function (apply) {
+		apply.init();
 	});
 }

@@ -6,10 +6,10 @@ class ControllerRestHeader extends Controller {
 		} else {
 			$server = $this->config->get('config_url');
 		}
-		
+
 		$this->data['base'] = $server;
-		$this->data['title'] = "菜鸽子供应链";
-				
+		$this->data['title'] = "寻钱宝";
+		
 		$this->template = 'default/template/rest/header.tpl';
     	$this->render();
 	}

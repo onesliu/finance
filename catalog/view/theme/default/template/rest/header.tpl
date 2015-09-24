@@ -16,12 +16,12 @@
 
 <link type="text/css" rel="stylesheet" href="catalog/view/javascript/jqm/jquery.mobile.custom.structure.min.css" />
 <link type="text/css" rel="stylesheet" href="catalog/view/javascript/jqm/jquery.mobile.icons.min.css" />
-<link type="text/css" rel="stylesheet" href="catalog/view/javascript/jqm/qingyou-theme.min.css" />
-<link type="text/css" rel="stylesheet" href="catalog/view/javascript/jqm/qingyou-custom.css?version=1.0" />
-<link type="text/css" rel="stylesheet" href="catalog/view/javascript/my/css/common.css?version=1.0" />
+<link type="text/css" rel="stylesheet" href="catalog/view/javascript/jqm/finance-theme.css" />
+<link type="text/css" rel="stylesheet" href="catalog/view/javascript/jqm/qingyou-custom.css?version=1.4" />
+<link type="text/css" rel="stylesheet" href="catalog/view/javascript/my/css/common.css?version=1.1" />
 
 <script src="catalog/view/javascript/jquery/jquery-1.11.1.min.js"></script>
 <script src="catalog/view/javascript/jqm/jquery.mobile.custom.min.js"></script>
-<script src="catalog/view/javascript/require.js" data-main="catalog/view/javascript/my/main"></script>
+<script src="catalog/view/javascript/require.js" data-main="catalog/view/javascript/my/main.js?ver=16"></script>
 
 </head>

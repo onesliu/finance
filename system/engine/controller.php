@@ -49,6 +49,23 @@ abstract class Controller {
 		}
 	}
 	
+	protected function call($child, $args = array()) {
+		$action = new Action($child, $args);
+	
+		if (file_exists($action->getFile())) {
+			require_once($action->getFile());
+
+			$class = $action->getClass();
+
+			$controller = new $class($this->registry);
+
+			return $controller->{$action->getMethod()}($action->getArgs());
+		} else {
+			trigger_error('Error: Could not load controller ' . $child . '!');
+			exit();
+		}
+	}
+	
 	protected function render() {
 		foreach ($this->children as $child) {
 			$this->data[basename($child)] = $this->getChild($child);

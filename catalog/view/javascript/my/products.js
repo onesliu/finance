@@ -1,27 +1,32 @@
-define(['mustache', 'widgets', 'cart', 'delayImg'], function(Mustache, widgets, cart, dimg) {
-    var	isMobile = window.navigator.userAgent.toLowerCase().indexOf('mobile') != -1,
-		sClick = isMobile ? 'tap' : 'click';
+define(['mustache', 'delayImg', 'requires'],
+	function(Mustache, dimg, requires) {
 		
-	var Products = {
-		uri: $.baseUrl + 'index.php?route=rest/products&category=',
+	return {
+		uri: $.baseUrl + 'index.php?route=rest/products',
+		appuri: $.baseUrl + 'index.php?route=rest/apply',
 		dataAll: null,
-		dataList: null,
-		childArr: null,
-		pList: $('#productList'),
-		pTemp: $('#productTemp').html(),
+		productAll: null,
+		pTitle: null,
+		pList: null,
+		pTemp: null,
 		cur_li: null,
+		cur_cat: 0,
 		no_image: "",
-		limit_catid: 0,
+		applyDialog: $("#applyDialog"),
+		pAppLimit: $("#applimit"),
+		pAppPeriod: $("#appperiod"),
+		btnApply: $("#applyBtn"),
 		productAjax: function(cat_id, limit) {
 			if (cat_id == null) return;
             var $this = this;
-			if (limit > 0) $this.limit_catid = cat_id;
-
+			if (!limit) limit = 0;
+			
             $.ajax({
-                url: $this.uri + cat_id,
+                url: $this.uri,
                 type: 'POST',
                 dataType: 'json',
 				data: {
+					category: cat_id,
 					limit: limit
 				},
                 success: function(data) {
@@ -31,10 +36,7 @@ define(['mustache', 'widgets', 'cart', 'delayImg'], function(Mustache, widgets, 
 							$this.dataAll = {};
                         $this.dataAll[cat_id] = data;
                         $this.buildData(data.info);
-						cart.sumView();
-						
-						if (cat_id == $this.limit_catid && limit == 0)
-							$this.showProduct(cat_id, null);
+						$this.showList(cat_id);
                     } else {
                     }
                 }
@@ -45,149 +47,231 @@ define(['mustache', 'widgets', 'cart', 'delayImg'], function(Mustache, widgets, 
 			if (data.length == 0) {
                 return false;
             }
-			if ($this.childArr == null)
-				$this.childArr = [];
+			if ($this.productAll == null)
+				$this.productAll = [];
             [].forEach.call(data, function(item, i) {
-				var category_id = item.category_id;
-				if ($this.childArr[category_id] == null)
-					$this.childArr[category_id] = [];
-				item.calcprice = function() {
-					return '￥' + (this.sellprice-0).toFixed(2);
+				item.minlimit = item.minlimit-0;
+				item.maxlimit = item.maxlimit-0;
+				item.minperiod = item.minperiod-0;
+				item.maxperiod = item.maxperiod-0;
+				item.minrate = item.minrate-0;
+				item.maxrate = item.maxrate-0;
+				item.type = function() {
+					if ((item.minlimit > 0 && item.minlimit < 1) && 
+						(item.maxlimit > 0 && item.maxlimit < 1))
+						return 1;  //抵押
+					return 0; //信贷
 				};
-				item.number = function() {
-					var incart = cart.incart(item.product_id);
-					if (incart > 0)
-						return incart;
-					return item.minimum;
+				item.limit = function() {
+					var ret;
+					if (item.type == 1)
+						ret = "评估价" + item.minlimit*100 + "%-" + item.maxlimit*100 + "%";
+					else
+						ret = item.minlimit + "-" + item.maxlimit + "万";
+					return ret;
 				};
-				item.buycls = function() {
-					var incart = cart.incart(item.product_id);
-					if (incart > 0)
-						return 'buybutton';
-					return '';
+				item.rate = function() {
+					var rate;
+					if (item.maxrate != "0")
+						rate = item.minrate + "%-" + item.maxrate + "%";
+					else
+						rate = item.minrate + "%";
+					return rate;
 				};
-				item.buylabel = function() {
-					var incart = cart.incart(item.product_id);
-					if (incart > 0)
-						return '取消';
-					return '购买';
+				item.period = function() {
+					var sp = "";
+					item.periods = [];
+					for(var i = (item.minperiod-0); i <= (item.maxperiod-0); i += (item.periodstep-0)) {
+						sp = sp + i + "/";
+						item.periods.push(i);
+					}
+					return sp + "月";
+				};
+				item.age = function() {
+					return item.minage + "-" + item.maxage;
+				};
+				item.match = function() {
+					if (item.matching)
+						return item.matching + "%";
+					else
+						return "0%";
 				};
 				item.no_image = $this.no_image;
-				$this.childArr[category_id].push(item);
-				var pid = item.product_id;
-				if ($this.dataList == null)
-					$this.dataList = {};
-				$this.dataList[pid] = item;
+				$this.productAll[item.product_id] = item;
             });
 		},
-		showProduct: function(pid, cid) {
+		showList: function(cat_id) {
 			var $this = this;
+			if ($this.pList == null) return;
 			if ($this.dataAll == null) return;
 			
 			var dataArr = {info: null};
-			if (pid != null) {
-				if ($this.dataAll.hasOwnProperty(pid))
-					dataArr.info = $this.dataAll[pid].info;
-			}
-			else if (cid != null) {
-				dataArr.info = $this.childArr[cid];
-			}
-			
+			dataArr.info = $this.dataAll[cat_id].info;
+
 			if (dataArr.info != null) {
-				$this.pList.html(Mustache.render($this.pTemp, dataArr));
-				dimg.init($this.pList.find('li'));
-				$this.pList.find('.amountBtn').bind(sClick, function(e) {
+				var itm = Mustache.render($this.pTemp, dataArr);
+				$this.pList.html(itm);
+				$this.pList.find('.btnWrap').bind($.sClick, function(e) {
 					e.stopPropagation();
-					$this.hideAmount();
-					$this.cur_li = $(this).parent().parent();
-					var amount = $(this).prev('.item-amount');
-					var aBtn = $(this);
-					var bBtn = $(this).next('.buyBtn');
-					amount.find('.text-amount').val(aBtn.find('button').text());
-					if (widgets) {
-						widgets.amount.init(amount.find('.minus'), amount.find('.text-amount'), amount.find('.plus'),
-							function(val) {
-								aBtn.find('button').text(val);
-								$this.changeAmount(val);
-							}
-						);
-					}
-					if (amount.css('display') == 'none') {
-						amount.show();
-						aBtn.hide();
-						bBtn.hide();
-					}
+					$this.cur_li = $(this).parent();
+					$this.showProduct($this.cur_li.attr("product_id"));
 				});
 				$this.pList.listview( "refresh" );
-				$this.pList.find('.buyBtn').bind(sClick, function(e) {
-					e.stopPropagation();
-					$this.cur_li = $(this).parent().parent();
-					$this.toggleProduct();
+				dimg.init($this.pList.find('li'));
+			}
+		},
+		showProduct: function(product_id) {
+			var $this = this;
+			$this.pDetail = $("#detailpage");
+			
+			var pTitle = $("#productName"),
+				tInfo1 = $("#productInfo1").html(),
+				tInfo2 = $("#productInfo2").html(),
+				pInfo1 = $("#pinfo1"),
+				pInfo2 = $("#pinfo2"),
+				pMaterial = $("#material"),
+				pRemark = $("#remark");
+				
+			var product = $this.productAll[product_id];
+			pTitle.html(product.name);
+			var srender = Mustache.render(tInfo1, product);
+			pInfo1.html(srender);
+			requires.getrpAjax(product_id, function() {
+				
+				$.mobile.navigate("#detailpage");
+				var req = {};
+				req.require = requires.getByProduct(product_id);
+				var srender = Mustache.render(tInfo2, req);
+				pInfo2.html(srender);
+				$this.pDetail.find("input").each(function(){
+					$(this).textinput();
+					//$(this).off("change");
+					$(this).on("change", function(){
+						requires.setRequire($(this).attr("rid"), $(this).attr("rvid"), $(this).val());
+					});
 				});
-			}
-		},
-		hideAmount: function() {
-			var $this = this;
-			if ($this.pList == null) return;
-			$this.pList.find('.item-amount').hide();
-			$this.pList.find('.amountBtn').show();
-			$this.pList.find('.buyBtn').show();
-			if (widgets) widgets.amount.clear();
-			$this.cur_li = null;
-		},
-		changeAmount: function(val) {
-			var $this = this;
-			if ($this.cur_li == null) return;
-			var buyBtn = $this.cur_li.find('.buyBtn').find('button');
-			var product_id = $this.cur_li.attr('product_id');
-			if (!buyBtn.hasClass('buybutton')) {
-				$this.toggleProduct();
-			}
-			if (cart) cart.addmodify($this.dataList[product_id], val);
-		},
-		toggleProduct: function() {
-			var $this = this;
-			if ($this.cur_li == null) return;
-			var btn = $this.cur_li.find('.buyBtn').find('button');
-			var product_id = $this.cur_li.attr('product_id');
-			var num = $this.cur_li.find('.amountBtn').find('button').html();
-			btn.toggleClass('buybutton');
-			if (btn.hasClass('buybutton')) {
-				widgets.dropAnimation($this.cur_li, $(window).width()/4, $(window).height() - 20);
-				btn.text(btn.attr('del'));
-				if (cart) cart.addmodify($this.dataList[product_id], num);
-			}
-			else {
-				btn.text(btn.attr('buy'));
-				if (cart) cart.del(product_id);
-			}
-		},
-		init: function(cat_arr) {
-			var $this = this;
-			if (cat_arr == null || cat_arr.length == 0)
-				return;
-			Array.prototype.forEach.call(cat_arr, function(cat, i) {
-				if (i == 0) {
-					$this.productAjax(cat.cat_id, 10);
-				}
-				setTimeout(function(){
-					$this.productAjax(cat.cat_id, 0);
-				}, 500);
+				$this.pDetail.find("select").each(function(){
+					$(this).selectmenu();
+					//$(this).off("change");
+					$(this).on("change", function(){
+						requires.setRequire($(this).attr("rid"), $(this).val());
+					});
+				});
 			});
-			$(document).off(sClick, "#homepage");
-			$(document).on(sClick, "#homepage", function() {
-				$this.hideAmount();
+			if (product.material.length > 0)
+				pMaterial.html(product.material);
+			else
+				pMaterial.hide();
+			if (product.remark.length > 0)
+				pRemark.html(product.remark);
+			else
+				pRemark.hide();
+			
+			//以下是申请对话框初始化
+			$this.pAppError($this.pAppLimit);
+			$this.pAppError($this.pAppPeriod);
+			$this.pAppError($this.btnApply);
+			if (product.type() == 1) {
+				$this.pAppLimit.val(product.maxlimit * 10 + "成");
+				$this.pAppLimit.attr("readonly");
+			} else {
+				$this.pAppLimit.removeAttr("readonly");
+				$this.pAppLimit.val(product.maxlimit);
+			}
+			
+			if ($this.pAppPeriod.length > 0) {
+				$this.pAppPeriod.empty();
+				$this.pAppPeriod.append("<option value='0'>还款期限（月）</option>");
+				$.each(product.periods, function(index, val) {
+					$this.pAppPeriod.append("<option value='"+val+"'>"+val+"</option>");
+				});
+				$this.pAppPeriod.selectmenu();
+				$this.pAppPeriod.selectmenu("refresh");
+			}
+			
+			$this.btnApply.off($.sClick);
+			$this.btnApply.on($.sClick, function(){
+				$this.pAppLimit.tiptxt.hide();
+				$this.pAppPeriod.tiptxt.hide();
+				var limit = $this.pAppLimit.val()-1;
+				if (product.type() == 0) {
+					if (limit > product.maxlimit || limit < product.minlimit) {
+						$this.pAppLimit.tiptxt.html("申请额度要在"+ product.limit() + "之间");
+						$this.pAppLimit.tiptxt.show();
+						return;
+					}
+				}
+				var period = $this.pAppPeriod.val();
+				if (!period || period <= 0) {
+					$this.pAppPeriod.tiptxt.html("请选择还款期限！");
+					$this.pAppPeriod.tiptxt.show();
+					return;
+				}
+				
+				$this.Apply(product, limit, period);
+			});
+		},
+		pAppError: function(input) {
+			if (!input.tiptxt)
+				input.tiptxt = input.next("p");
+			input.tiptxt.hide();
+		},
+		Apply: function(product, limit, period) {
+            var $this = this;
+			if (!product) return;
+			if (!limit) limit = product.maxlimit;
+			if (product.type() == 1) limit = product.maxlimit;
+			if (!period) period = product.maxperiod;
+			
+            $.ajax({
+                url: $this.appuri + "/apply",
+                type: 'POST',
+                dataType: 'json',
+				data: {
+					product_id: product.product_id,
+					limit: limit,
+					period: period
+				},
+                success: function(data) {
+                    if (data.result == '0') {
+						//$this.applyDialog.popup("close");
+						$.mobile.navigate("#applylistpage");
+                    } else {
+						$this.pAppError($this.btnApply);
+						$this.btnApply.tiptxt.html(data.result);
+						$this.btnApply.tiptxt.show();
+                    }
+                }
+            })
+		},
+		show: function(cat_id) {
+			var $this = this;
+			$this.cur_cat = cat_id;
+			$.mobile.navigate("#productpage");
+
+			if (!$this.pTitle)
+				$this.pTitle = $('#plistName');
+			if (!$this.pList)
+				$this.pList = $('#productlist');
+			if (!$this.pTemp)
+				$this.pTemp = $('#productItem').html();
+			
+			$this.pTitle.text(cat_id);
+			//$this.productAjax(cat_id);
+		},
+		init: function(cat_arr, limit) {
+			var $this = this;
+
+			$(document).off("pagebeforeshow", "#productpage");
+			$(document).on("pagebeforeshow", "#productpage", function() {
+				$this.pList.html("");
+				$this.productAjax($this.cur_cat, limit);
+			});
+			$(document).off("pageshow", "#productpage");
+			$(document).on("pageshow", "#productpage", function() {
+				dimg.init($this.pList.find('li'));
 			});
 		}
 	};
-	
-	return {
-		init : function init(cat_arr) {
-			Products.init(cat_arr);
-			cart.init(Products);
-		},
-		showProducts: function(pid, cid) {
-			Products.showProduct(pid, cid);
-		}
-　　};
+
 })

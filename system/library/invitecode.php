@@ -12,10 +12,10 @@ class Invitecode {
 		$this->log = $registry->get('log');
 	}
 	
-	public function codeType($code) {
+	public function codeInfo($code) {
 		
 		$this->db->begin();
-		$ret = $this->db->query("select usertype from oc_invitecode where code='$code'");
+		$ret = $this->db->query("select * from oc_invitecode where code='$code'");
 		if ($ret == false || $ret->num_rows == 0) {
 			$this->log->write("invitecode get ERROR.");
 			$this->db->rollback();
@@ -23,7 +23,7 @@ class Invitecode {
 		}
 		$this->db->commit();
 		
-		return $ret->row['usertype'];
+		return $ret->row;
 	}
 	
 	public function useCode($code, $userid) {

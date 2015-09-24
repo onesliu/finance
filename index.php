@@ -26,6 +26,7 @@ require_once(DIR_SYSTEM . 'library/length.php');
 require_once(DIR_SYSTEM . 'library/cart.php');
 require_once(DIR_SYSTEM . 'library/coupon.php');
 require_once(DIR_SYSTEM . 'library/invitecode.php');
+require_once(DIR_SYSTEM . 'library/user.php');
 
 // Registry
 $registry = new Registry();
@@ -190,6 +191,9 @@ $registry->set('document', new Document());
 
 // Customer
 $registry->set('customer', new Customer($registry));
+
+// User
+$registry->set('user', new User($registry));
 
 // Coupon
 $registry->set('coupon', new Coupon($registry));

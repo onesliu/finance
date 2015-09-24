@@ -5,6 +5,12 @@ class ControllerRestHome extends Controller {
 		$this->data['heading_title'] = $this->config->get('config_title');
 		$this->data['userlogin'] = $this->url->link('rest/user');
 		$this->data['addredit'] = $this->url->link('rest/address');
+		$this->data['inviteurl'] = $this->url->link('rest/user/invite');
+		
+		$this->data['isuser'] = false;
+		if ($this->user->isLogged()) {
+			$this->data['isuser'] = true;
+		}
 		
 		$this->template = 'default/template/rest/home.tpl';
 		$this->children = array(

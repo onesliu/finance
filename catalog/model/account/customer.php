@@ -86,37 +86,43 @@ class ModelAccountCustomer extends Model {
 	}
 	
 	public function add_customer($data) {
-		$sql = "select count(*) as cnt from oc_customer where email='%s'";
-		$sql = sprintf($sql, $this->db->escape($data["telephone"]));
+		$sql = "select count(*) as cnt from oc_customer where email='%s' or telephone='%s'";
+		$sql = sprintf($sql, $this->db->escape($data["email"]), $this->db->escape($data["telephone"]));
 		$ret = $this->db->query($sql);
 		if ($ret == false || $ret->row['cnt'] > 0) {
-			return "重复的手机号码";
+			return "重复的手机号码或电子邮件帐号";
 		}
 		
 		$sql = "insert into oc_customer set nickname = '%s', email = '%s', firstname ='%s',
-			password = SHA1(CONCAT(salt, SHA1(CONCAT(salt, SHA1('%s'))))),
+			password = SHA1(CONCAT(salt, SHA1(CONCAT(salt, SHA1('%s'))))), telephone='%s', user_id=%d,
 			customer_group_id = 1, date_added = now(), status = 1, approved = 1";
-			
-		$sql = sprintf($sql, $this->db->escape($data["username"]), $this->db->escape($data["telephone"]),
-			$this->db->escape($data["username"]), $this->db->escape($data['password']));
+		
+		if (!isset($data["username"])) {
+			$data["username"] = "";
+		}
+		$sql = sprintf($sql, $this->db->escape($data["username"]), $this->db->escape($data["email"]),
+			$this->db->escape($data["username"]), $this->db->escape($data['password']),
+			$this->db->escape($data["telephone"]), $data["userid"]);
 		$this->db->query($sql);
 		
 		$customer_id = $this->db->getLastId();
 		
-		$this->load->model('account/address');
-		$this->model_account_address->addAddress($data);
-		$sql = "INSERT INTO " . DB_PREFIX . 
-			"address SET customer_id = '" . (int)$customer_id . 
-			"', firstname = '" . $this->db->escape($data["username"]) . 
-			"', company = '" . $this->db->escape($data["storename"]) . 
-			"', address_1 = '" . $this->db->escape($data["address"]) . 
-			"', telephone = '" . $this->db->escape($data["telephone"]) . "'";
-		$this->db->query($sql);
-		
-		$address_id = $this->db->getLastId();
-		
-		$sql = "update oc_customer set address_id=$address_id";
-		$this->db->query($sql);
+		if (isset($data["address"])) {
+			$this->load->model('account/address');
+			$this->model_account_address->addAddress($data);
+			$sql = "INSERT INTO " . DB_PREFIX . 
+				"address SET customer_id = '" . (int)$customer_id . 
+				"', firstname = '" . $this->db->escape($data["username"]) . 
+				"', company = '" . $this->db->escape($data["storename"]) . 
+				"', address_1 = '" . $this->db->escape($data["address"]) . 
+				"', telephone = '" . $this->db->escape($data["telephone"]) . "'";
+			$this->db->query($sql);
+			
+			$address_id = $this->db->getLastId();
+			
+			$sql = "update oc_customer set address_id=$address_id";
+			$this->db->query($sql);
+		}
 		
 		return (int)$customer_id;
 	}
@@ -126,7 +132,16 @@ class ModelAccountCustomer extends Model {
 	}
 
 	public function editPassword($email, $password) {
-      	$this->db->query("UPDATE " . DB_PREFIX . "customer SET salt = '" . $this->db->escape($salt = substr(md5(uniqid(rand(), true)), 0, 9)) . "', password = '" . $this->db->escape(sha1($salt . sha1($salt . sha1($password)))) . "' WHERE LOWER(email) = '" . $this->db->escape(utf8_strtolower($email)) . "'");
+		if (is_numeric($email))
+			$this->db->query("UPDATE " . DB_PREFIX . "customer SET salt = '" .
+			$this->db->escape($salt = substr(md5(uniqid(rand(), true)), 0, 9)) .
+			"', password = '" . $this->db->escape(sha1($salt . sha1($salt . sha1($password)))) .
+			"' WHERE customer_id = '" . $email . "'");
+		else
+			$this->db->query("UPDATE " . DB_PREFIX . "customer SET salt = '" .
+			$this->db->escape($salt = substr(md5(uniqid(rand(), true)), 0, 9)) .
+			"', password = '" . $this->db->escape(sha1($salt . sha1($salt . sha1($password)))) .
+			"' WHERE LOWER(email) = '" . $this->db->escape(utf8_strtolower($email)) . "'");
 	}
 
 	public function editNewsletter($newsletter) {

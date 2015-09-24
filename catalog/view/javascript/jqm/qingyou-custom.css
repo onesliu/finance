@@ -14,6 +14,30 @@
 	text-shadow: 0 0px 0 #f3f3f3 !important;
 }
 
+.my-btn-icon {
+	width: 4.5em;
+	height: 4.5em;
+}
+.my-btn-icon:after {
+	width: 4.5em;
+	height: 4.5em;
+	margin: 0;
+	left: .5em;
+	top: .5em;
+	border-radius: 3em;
+	-moz-border-radius: 3em;
+	-webkit-border-radius: 3em;
+}
+
+.icon-hide:after {
+	display: none;
+}
+
+.menu-list a, .menu-list-item{
+	padding-top: 1.3em;
+	padding-bottom: 1.3em;
+}
+
 .footer-button-left,
 .footer-button-right {
 	position: absolute;
@@ -159,7 +183,7 @@
 }
 .productlist img {
 	width: 50px !important;
-	height: 50px !important;
+	height: 45px !important;
 	top: auto !important;
 }
 .productlist .info {
@@ -175,6 +199,7 @@
 }
 .productlist .desc {
 	color: #888888 !important;
+	font-weight: normal !important;
 	font-size: .75em;
 	padding: .125em 0 !important;
 }
@@ -193,7 +218,7 @@
     padding-top: 1em;
     bottom: 0;
     text-align: center;
-	width: 7em;
+	width: 5em;
 }
 .productlist .item-amount {
 	left: -1.7em;
@@ -213,6 +238,9 @@
 	margin: 0 !important;
 	font-size: .85em;
 }
+.productlist .btnWrap .right-icon {
+	right: .8em;
+}
 
 .buybutton {
 	top: .1em !important;
@@ -221,6 +249,21 @@
 	color: #fff !important;
 	font-weight: normal !important;
 	text-shadow: 0 0px 0 #f3f3f3 !important;
+}
+
+/*****************************************************/
+
+.ui-btn {
+	border-style: solid;
+	font-size:.8em;
+	font-weight: normal !important;
+	text-shadow: 0 0px 0 #f3f3f3 !important;
+}
+
+.ui-li-count {
+	background-color: #fefbd8 !important;
+	border-color: inherit !important;
+	color: inherit !important;
 }
 
 .ui-icon-cart:after {
@@ -232,6 +275,10 @@
 .ui-alt-icon .ui-icon-cart:after {
 	background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiICB3aWR0aD0iNTBweCIgaGVpZ2h0PSI1MHB4IiB2aWV3Qm94PSIyNDQuNSAtMTA1LjUgNTAgNTAiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMjQ0LjUgLTEwNS41IDUwIDUwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBkPSJNMjc0LjM5NS03MC4xNjdjMCwxLjkzNC0xLjU2OCwzLjUtMy41LDMuNWMtMS45MzQsMC0zLjUtMS41NjYtMy41LTMuNWMwLTEuOTMzLDEuNTY2LTMuNSwzLjUtMy41IEMyNzIuODI2LTczLjY2NywyNzQuMzk1LTcyLjEsMjc0LjM5NS03MC4xNjd6IE0yODEuODk1LTczLjY2N2MtMS45MzQsMC0zLjUsMS41NjctMy41LDMuNWMwLDEuOTM0LDEuNTY2LDMuNSwzLjUsMy41IGMxLjkzMiwwLDMuNS0xLjU2NiwzLjUtMy41QzI4NS4zOTUtNzIuMSwyODMuODI2LTczLjY2NywyODEuODk1LTczLjY2N3ogTTI4OS4wNjEtODUuNWMwLTEuMzgxLTEuMTE5LTIuNS0yLjUtMi41aC0yMC41OTYgbC0xLjA3Ni0yLjc0NWMtMC4yODktMC43MzUtMC45MDgtMS4yOTItMS42Ny0xLjVsLTcuMzMyLTJjLTEuMzI4LTAuMzYyLTIuNzA1LDAuNDIyLTMuMDcsMS43NTUgYy0wLjM2MywxLjMzMiwwLjQyMiwyLjcwNiwxLjc1NCwzLjA2OWw2LjEyMSwxLjY3bDQuMzQsMTEuMDY4YzAuMzc1LDAuOTU3LDEuMjk5LDEuNTg3LDIuMzI2LDEuNTg3aDE3LjUzNyBjMS4zODEsMCwyLjUtMS4xMTksMi41LTIuNXMtMS4xMTktMi41LTIuNS0yLjVoLTE1LjgzMkwyNjcuOTI0LTgzaDE4LjYzN0MyODcuOTQxLTgzLDI4OS4wNjEtODQuMTE5LDI4OS4wNjEtODUuNXoiLz48L3N2Zz4=");
 	background-size: 18px 18px;
+}
+
+.ui-icon-user40:after {
+	background-image: url("data:image/svg+xml;charset=US-ASCII,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22iso-8859-1%22%3F%3E%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%20%20width%3D%2235px%22%20height%3D%2235px%22%20viewBox%3D%220%200%2014%2014%22%20style%3D%22enable-background%3Anew%200%200%2014%2014%3B%22%20xml%3Aspace%3D%22preserve%22%3E%3Cpath%20fill%3D%22%23FFF%22%20d%3D%22M8.851%2C10.101c-0.18-0.399-0.2-0.763-0.153-1.104C9.383%2C8.49%2C9.738%2C7.621%2C9.891%2C6.465C10.493%2C6.355%2C10.5%2C5.967%2C10.5%2C5.5%20c0-0.437-0.008-0.804-0.502-0.94C9.999%2C4.539%2C10%2C4.521%2C10%2C4.5c0-2.103-1-4-2-4C8%2C0.5%2C7.5%2C0%2C6.5%2C0C5%2C0%2C4%2C1.877%2C4%2C4.5%20c0%2C0.021%2C0.001%2C0.039%2C0.002%2C0.06C3.508%2C4.696%2C3.5%2C5.063%2C3.5%2C5.5c0%2C0.467%2C0.007%2C0.855%2C0.609%2C0.965%20C4.262%2C7.621%2C4.617%2C8.49%2C5.303%2C8.997c0.047%2C0.341%2C0.026%2C0.704-0.153%2C1.104C1.503%2C10.503%2C0%2C12%2C0%2C12v2h14v-2%20C14%2C12%2C12.497%2C10.503%2C8.851%2C10.101z%22%2F%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3Cg%3E%3C%2Fg%3E%3C%2Fsvg%3E");
 }
 
 .ui-icon-apple12 {
